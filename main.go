@@ -1,9 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"encoding/xml"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 	"hxbk_resp/models"
+	"io/ioutil"
 )
 
 func main() {
@@ -17,9 +22,7 @@ func main() {
 		//c.Header("header", xml.Header)
 		//header := `<?xml version="1.0" encoding="GBK"?>` + "\n"
 		//c.Header("header", header)
-		c.Header("Content-Type", "text/xml;charset=UTF-8")
-		//c.Header("-Type", "text/xml;charset=GBK")
-		//c.Header("Content-Type", "text/xml;charset=GBK")
+		c.Header("Content-Type", "text/xml;charset=GBK")
 		c.Writer.Write(resp)
 
 	})
@@ -30,7 +33,6 @@ func main() {
 
 	r.Run(":8080")
 }
-
 func GetDullData() []byte {
 	data := models.HxDataStruct{
 		Result:          true,
@@ -97,16 +99,18 @@ func GetDullData() []byte {
 			},
 		},
 	}
-	//b, err := xml.Marshal(data)
-	//if err != nil {
-	//	log.Println(err)
-	//	return nil
-	//}
-	b, _ := xml.MarshalIndent(data, "", "	")
-	//xml.Marshal(data)
-	//xmlHeader := `<?xml version="1.0" encoding="UTF-8"?>` + "\n"
-	resp := append([]byte(xml.Header), b...)
-	return resp
+	//b, _ := xml.MarshalIndent(data, "", "	")
+	b, _ := xml.Marshal(data)
+	//xmlHeader := `<?xml version="1.0" encoding="GBK"?>` + "\n"
+	xmlHeader := `<?xml version="1.0" encoding="GBK"?>`
+	resp := append([]byte(xmlHeader), b...)
+	//UTF-8转换GBK
+	respGbk, err := Utf8ToGbk(resp)
+	if err != nil {
+		fmt.Printf("err=%v", err)
+		return nil
+	}
+	return respGbk
 }
 
 func GetFastData() *models.HxDataStruct {
@@ -203,4 +207,13 @@ func GetFastData() *models.HxDataStruct {
 	}
 
 	return &data
+}
+
+func Utf8ToGbk(s []byte) ([]byte, error) {
+	reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewEncoder())
+	d, e := ioutil.ReadAll(reader)
+	if e != nil {
+		return nil, e
+	}
+	return d, nil
 }
