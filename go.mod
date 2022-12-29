@@ -3,6 +3,7 @@ module hxbk_resp
 go 1.16
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect

@@ -19,8 +19,8 @@ type HxDataStruct struct {
 type OrgType struct {
 	OrgId   string       `xml:"机构ID"`
 	OrgName string       `xml:"名称"`
-	Staff   []*StaffType `xml:"人员"`
-	Org     *OrgType     `xml:"机构"`
+	Staff   *[]StaffType `xml:"人员"`
+	Org     *[]OrgType   `xml:"机构"`
 }
 
 //人员
